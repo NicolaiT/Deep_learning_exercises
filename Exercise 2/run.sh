@@ -1,0 +1,2 @@
+python3 data_cleaning.py
+python3 matplot_plotter.py
