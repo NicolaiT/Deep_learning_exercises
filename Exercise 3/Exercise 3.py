@@ -15,20 +15,26 @@ from tensorflow.python.keras.models import Sequential
 train_data = train_data.reshape((60000, 28*28))
 test_data = test_data.reshape((10000, 28*28))
 num_classes = 10
-EPOCHS = 10
+EPOCHS = 50
 train_labels = to_categorical(train_labels, num_classes)
 test_labels = to_categorical(test_labels, num_classes)
 
-# Exercise 1
-# Softmax for multi-neuron output layers (classification with multiple options)
+
 inputs = Input(shape=(28*28,))
-x = Dense(16, activation='relu', kernel_regularizer=regularizers.l2(0.001))(inputs)
-x = Dense(16, activation='relu', kernel_regularizer=regularizers.l2(0.001))(x)
-x = Dense(16, activation='relu', kernel_regularizer=regularizers.l2(0.001))(x)
-x = Dense(16, activation='relu', kernel_regularizer=regularizers.l2(0.001))(x)
-x = Dense(16, activation='relu', kernel_regularizer=regularizers.l2(0.001))(x)
-x = Dense(16, activation='relu', kernel_regularizer=regularizers.l2(0.001))(x)
-x = Dense(16, activation='relu', kernel_regularizer=regularizers.l2(0.001))(x)
+x = Dropout(0.8)(inputs)
+x = Dense(64, activation='relu', kernel_regularizer=regularizers.l2(0.001))(inputs)
+x = Dropout(0.25)(x)
+x = Dense(64, activation='relu', kernel_regularizer=regularizers.l2(0.001))(x)
+x = Dropout(0.25)(x)
+x = Dense(64, activation='relu', kernel_regularizer=regularizers.l2(0.001))(x)
+#x = Dropout(0.5)(x)
+x = Dense(64, activation='relu', kernel_regularizer=regularizers.l2(0.001))(x)
+#x = Dropout(0.5)(x)
+x = Dense(64, activation='relu', kernel_regularizer=regularizers.l2(0.001))(x)
+#x = Dropout(0.5)(x)
+x = Dense(64, activation='relu', kernel_regularizer=regularizers.l2(0.001))(x)
+x = Dropout(0.5)(x)
+x = Dense(64, activation='relu', kernel_regularizer=regularizers.l2(0.001))(x)
 output = Dense(10, activation='softmax')(x)
 #x = Dropout(0.5)(x)
 Model = Model(inputs, output)
@@ -36,10 +42,9 @@ Model.compile(optimizer='rmsprop', loss='categorical_crossentropy', metrics=['ac
 
 history = Model.fit(train_data, train_labels, epochs=EPOCHS, batch_size=64, validation_data=(test_data, test_labels))
 
-# Exercise 2
 print('Model accuracy: ' + str(Model.evaluate(test_data, test_labels)[1]))
 
-# Exercise 3
+# Sets up the graph
 plt.plot(range(EPOCHS), history.history['loss'], '-', color='r', label='Training loss')
 plt.plot(range(EPOCHS), history.history['val_loss'], '--', color='r', label='Validation loss')
 plt.plot(range(EPOCHS), history.history['acc'], '-', color='b', label='Training accuracy')
@@ -50,4 +55,12 @@ plt.ylabel('Loss / Accuracy')
 plt.legend()
 plt.show()
 
-plt.savefig('graph_L2_Big.png')
+plt.savefig('graph.png')
+
+# Observation: L2 seems to do slighty better versus L1.
+# Obviously, the more layers, units and epocs, the higher accuracy - although this will tend to overfit. 
+# (In order to identify overfitting, look at the graph, where the validation loss starts to rise)
+# Dropout can help against overfitting problem. However, this requires some experimentation
+# Running the code as it is significantly lowers the validation loss to 0.25 average.
+# Without any dropouts, the validation loss tend to jump up to 0.33. See
+# Another way to stop overfitting, we can use early stopping. (not implemented)
