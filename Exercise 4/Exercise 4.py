@@ -6,24 +6,20 @@ from tensorflow.keras import regularizers
 import seaborn as sns
 import matplotlib.pyplot as plt
 import numpy as np
-# Loads the data
 from tensorflow.python.keras.models import Sequential
 
-# This is based on the solution of the first exercise
-
 (train_data, train_labels), (test_data, test_labels) = mnist.load_data()
-# Reshapes the data to work in a FFN
 num_classes = 10
 EPOCHS = 10
 train_labels = to_categorical(train_labels, num_classes)
 test_labels = to_categorical(test_labels, num_classes)
 
-print(train_data.shape)
 train_data = train_data.reshape((60000,28,28,1))
 test_data = test_data.reshape((10000,28,28,1))
-print(train_data.shape)
 
 train_data = train_data.astype('float')
+
+# TODO: visualize the filters
 
 model = Sequential()
 model.add(Conv2D(32, (3,3), activation='relu',input_shape=(28,28,1) , kernel_regularizer=regularizers.l2(0.001)))
